@@ -3,7 +3,9 @@ set realname="Franky W."
 set move = no
 set editor = 'vim'
 
-set my_email = "`echo ${EMAIL}`"
+set my_email_0 = "`echo ${EMAIL_0} | sed -E s/@gmail.com//g`"
+set my_email_1 = "`echo ${EMAIL_1} | sed -E s/@gmail.com//g`"
+set my_email_2 = "`echo ${EMAIL_2} | sed -E s/@gmail.com//g`"
 
 # Cache headers for quicker loading
 set header_cache="~/Mail/.hcache"
@@ -29,20 +31,32 @@ set sort_aux=reverse-last-date-received
 # Have a split vue 
 set pager_index_lines=15
 
-
-set spoolfile="imaps://$my_email@imap.gmail.com:993"
+# Default imap account
+set spoolfile="imaps://$my_email_0@imap.gmail.com:993"
 
 set signature="Franky W."
 
 # Set the display order of the headers.
 hdr_order From: To: Cc: Reply-To: Subject: Date:
 
-# Gmail
-set my_pass_new_relic=`security find-internet-password -g -a ${EMAIL} -s imap.gmail.com 2>&1 | perl -e 'if (<STDIN> =~ m/password: "(.*)"$/ ) { print $1; }'`
-account-hook imaps://$my_email@imap.gmail.com:993 'set imap_user=$my_email imap_pass=$my_pass_new_relic'
-folder-hook imaps://$my_email@imap.gmail.com:993 'set folder=imaps://imap.gmail.com:993/ spoolfile=+INBOX  record="" postponed=+[Gmail]/Drafts from="Franky W. <$my_email>"; set smtp_url="smtp://$my_email@smtp.gmail.com:587/"; set smtp_pass=$my_pass_new_relic' 
+# Gmail Account 0
+set my_pass_email_0=`security find-internet-password -g -a $(echo $EMAIL_0 | sed s/@gmail.com//g) -s imap.gmail.com 2>&1 | perl -e 'if (<STDIN> =~ m/password: "(.*)"$/ ) { print $1; }'`
+account-hook imaps://$my_email_0@imap.gmail.com:993 'set imap_user=$my_email_0 imap_pass=$my_pass_email_0'
+folder-hook imaps://$my_email_0@imap.gmail.com:993 'set folder=imaps://imap.gmail.com:993/ spoolfile=+INBOX  record="" postponed=+[Gmail]/Drafts from="Franky W. <$my_email_0>"; set smtp_url="smtp://$my_email_0@smtp.gmail.com:587/"; set smtp_pass=$my_pass_email_0' 
 
-macro index \e1 "c imaps://$my_email@imap.gmail.com:993<enter>"
+# Gmail Account 1
+set my_pass_email_1=`security find-internet-password -g -a $(echo $EMAIL_1 | sed s/@gmail.com//g) -s imap.gmail.com 2>&1 | perl -e 'if (<STDIN> =~ m/password: "(.*)"$/ ) { print $1; }'`
+account-hook imaps://$my_email_1@imap.gmail.com:993 'set imap_user=$my_email_1 imap_pass=$my_pass_email_1'
+folder-hook imaps://$my_email_1@imap.gmail.com:993 'set folder=imaps://imap.gmail.com:993/ spoolfile=+INBOX  record="" postponed=+[Gmail]/Drafts from="Franky W. <$my_email_1>"; set smtp_url="smtp://$my_email_1@smtp.gmail.com:587/"; set smtp_pass=$my_pass_email_1' 
+
+# Gmail Account 2
+set my_pass_email_2=`security find-internet-password -g -a $(echo $EMAIL_2 | sed s/@gmail.com//g) -s imap.gmail.com 2>&1 | perl -e 'if (<STDIN> =~ m/password: "(.*)"$/ ) { print $1; }'`
+account-hook imaps://$my_email_2@imap.gmail.com:993 'set imap_user=$my_email_2 imap_pass=$my_pass_email_2'
+folder-hook imaps://$my_email_2@imap.gmail.com:993 'set folder=imaps://imap.gmail.com:993/ spoolfile=+INBOX  record="" postponed=+[Gmail]/Drafts from="Franky W. <$my_email_2>"; set smtp_url="smtp://$my_email_2@smtp.gmail.com:587/"; set smtp_pass=$my_pass_email_2' 
+
+macro index \e1 "c imaps://$my_email_0@imap.gmail.com:993<enter>"
+macro index \e2 "c imaps://$my_email_1@imap.gmail.com:993<enter>"
+macro index \e3 "c imaps://$my_email_2@imap.gmail.com:993<enter>"
 
 # vim: filetype=muttrc
 
@@ -195,3 +209,96 @@ color body          red             default         "([a-z][a-z0-9+-]*://(((([a-
 #folder-hook gmail/inbox        "color status        J_black         yellow          "
 #folder-hook gmail/important    "color status        J_black         yellow          "
 
+
+
+
+############################# Start of PGP Settings ################################
+## -*-muttrc-*-
+##
+## Command formats for gpg.
+## 
+## This version uses gpg-2comp from 
+##   http://muppet.faveve.uni-stuttgart.de/~gero/gpg-2comp.tar.gz
+##
+## $Id: gpg.rc,v 3.1 2002/03/26 22:23:58 roessler Exp $
+##
+## %p    The empty string when no passphrase is needed,
+##       the string "PGPPASSFD=0" if one is needed.
+##
+##       This is mostly used in conditional % sequences.
+##
+## %f    Most PGP commands operate on a single file or a file
+##       containing a message.  %f expands to this file's name.
+##
+## %s    When verifying signatures, there is another temporary file
+##       containing the detached signature.  %s expands to this
+##       file's name.
+##
+## %a    In "signing" contexts, this expands to the value of the
+##       configuration variable $pgp_sign_as.  You probably need to
+##       use this within a conditional % sequence.
+##
+## %r    In many contexts, mutt passes key IDs to pgp.  %r expands to
+##       a list of key IDs.
+#
+## Note that we explicitly set the comment armor header since GnuPG, when used
+## in some localiaztion environments, generates 8bit data in that header, thereby
+## breaking PGP/MIME.
+#
+####pgp
+##set pgp_show_unusable
+#set pgp_autosign=yes
+#set pgp_replyencrypt=yes
+#set pgp_replysign=yes
+#set pgp_replysignencrypted=yes
+#set pgp_timeout=180
+#
+## decode application/pgp
+#set pgp_decode_command="/usr/local/bin/gpg  --charset utf-8   %?p?--passphrase-fd 0? --no-verbose --quiet  --batch  --output - %f"
+#
+## verify a pgp/mime signature
+#set pgp_verify_command="/usr/local/bin/gpg   --no-verbose --quiet  --batch  --output - --verify %s %f"
+#
+## decrypt a pgp/mime attachment
+#set pgp_decrypt_command="/usr/local/bin/gpg   --passphrase-fd 0 --no-verbose --quiet  --batch  --output - %f"
+#
+## create a pgp/mime signed attachment
+## set pgp_sign_command="/usr/local/bin/gpg-2comp --comment '' --no-verbose --batch  --output - --passphrase-fd 0 --armor --detach-sign --textmode %?a?-u %a? %f"
+#set pgp_sign_command="/usr/local/bin/gpg    --no-verbose --batch --quiet   --output - --passphrase-fd 0 --armor --detach-sign --textmode %?a?-u %a? %f"
+#
+## create a application/pgp signed (old-style) message
+## set pgp_clearsign_command="/usr/local/bin/gpg-2comp --comment ''  --no-verbose --batch  --output - --passphrase-fd 0 --armor --textmode --clearsign %?a?-u %a? %f"
+#set pgp_clearsign_command="/usr/local/bin/gpg   --charset utf-8 --no-verbose --batch --quiet   --output - --passphrase-fd 0 --armor --textmode --clearsign %?a?-u %a? %f"
+#
+## create a pgp/mime encrypted attachment
+## set pgp_encrypt_only_command="pgpewrap gpg-2comp  -v --batch  --output - --encrypt --textmode --armor --always-trust -- -r %r -- %f"
+#set pgp_encrypt_only_command="pgpewrap /usr/local/bin/gpg  --charset utf-8    --batch  --quiet  --no-verbose --output - --encrypt --textmode --armor --always-trust -- -r %r -- %f"
+#
+## create a pgp/mime encrypted and signed attachment
+## set pgp_encrypt_sign_command="pgpewrap gpg-2comp  --passphrase-fd 0 -v --batch  --output - --encrypt --sign %?a?-u %a? --armor --always-trust -- -r %r -- %f"
+#set pgp_encrypt_sign_command="pgpewrap /usr/local/bin/gpg  --charset utf-8 --passphrase-fd 0  --batch --quiet  --no-verbose  --textmode --output - --encrypt --sign %?a?-u %a? --armor --always-trust -- -r %r -- %f"
+#
+## import a key into the public key ring
+#set pgp_import_command="/usr/local/bin/gpg  --no-verbose --import -v %f"
+#
+## export a key from the public key ring
+#set pgp_export_command="/usr/local/bin/gpg   --no-verbose --export --armor %r"
+#
+## verify a key
+#set pgp_verify_key_command="/usr/local/bin/gpg   --verbose --batch  --fingerprint --check-sigs %r"
+#
+## read in the public key ring
+#set pgp_list_pubring_command="/usr/local/bin/gpg   --no-verbose --batch --quiet   --with-colons --list-keys %r"
+#
+## read in the secret key ring
+#set pgp_list_secring_command="/usr/local/bin/gpg   --no-verbose --batch --quiet   --with-colons --list-secret-keys %r"
+#
+## fetch keys
+## set pgp_getkeys_command="pkspxycwrap %r"
+#
+## pattern for good signature - may need to be adapted to locale!
+#
+## set pgp_good_sign="^gpg: Good signature from"
+#
+## OK, here's a version which uses gnupg's message catalog:
+#set pgp_good_sign="`gettext -d gnupg -s 'Good signature from "' | tr -d '"'`"
